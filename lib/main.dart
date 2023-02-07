@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'data_model/SqFliteDB.dart';
+import 'data_model/dog.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -49,8 +53,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  late SqliteDB db;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    db = SqliteDB();
+    super.initState();
+  }
+
+  void _incrementCounter() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -59,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+    print(await db.getDogs());
   }
 
   @override
@@ -102,6 +114,33 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            TextButton(
+              onPressed: () {
+                //insert into db
+                insertIntoDb();
+              },
+              child: const Text(
+                'insert',
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                //update into db
+                updateRecord();
+              },
+              child: const Text(
+                'update',
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                //delete record from db
+                deleteRecord();
+              },
+              child: const Text(
+                'delete',
+              ),
+            ),
           ],
         ),
       ),
@@ -111,5 +150,27 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> insertIntoDb() async {
+    var dogData = const Dog(
+      id: 1,
+      name: "Jintak",
+      age: 2,
+    );
+    await db.insertDog(dogData);
+  }
+
+  Future<void> updateRecord() async {
+    var dogData = const Dog(
+      id: 1,
+      name: "Jintak Chitak",
+      age: 2,
+    );
+    await db.updateDog(dogData);
+  }
+
+  Future<void> deleteRecord() async {
+    await db.deleteDog(1);
   }
 }
